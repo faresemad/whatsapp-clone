@@ -11,7 +11,7 @@ def signup(request):
             new_user = form.save()
             new_user = authenticate(username=form.cleaned_data["username"], password=form.cleaned_data["password1"])
             login(request, new_user)
-            return HttpResponseRedirect(reverse("chat:index"))
+            return HttpResponseRedirect(reverse("chat:create_chat_room"))
     else:
         form = SignUpForm()
     return render(request, "account/signup.html", {"form": form})
@@ -25,7 +25,7 @@ def login_user(request):
         if user:
             if user.is_active:
                 login(request, user)
-                return HttpResponseRedirect(reverse("chat:index"))
+                return HttpResponseRedirect(reverse("chat:room_list"))
             else:
                 return HttpResponse("User is not active")
         else:
