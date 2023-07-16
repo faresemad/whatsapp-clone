@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Login Form Example - Register</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class="login-form">
+        <form method="POST">
+            {% csrf_token %}
+            <h1>Register</h1>
+            <div class="content">
+                <div class="input-field">
+                    <input type="text" placeholder="Name" autocomplete="name" name="username">
+                </div>
+                <div class="input-field">
+                    <input type="email" placeholder="Email" autocomplete="email" name="email">
+                </div>
+                <div class="input-field">
+                    <input type="password" placeholder="Password" autocomplete="new-password" name="password1">
+                </div>
+                <div class="input-field">
+                    <input type="password" placeholder="Confirm Password" autocomplete="new-password" name="password2">
+                </div>
+            </div>
+            <div class="action">
+                <button type="submit">Register</button>
+                <button type="button"><a href="{% url 'account:login' %}">Sign in</a></button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

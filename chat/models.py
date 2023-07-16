@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 class ChatRoom(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    users = models.ManyToManyField(User, related_name="chatrooms")
+    users = models.ManyToManyField(User, related_name="chatrooms", blank=True)
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to="chatroom/", blank=True, null=True)
     description = models.TextField(blank=True, null=True)

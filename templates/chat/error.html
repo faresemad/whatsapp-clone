@@ -1,6 +1,16 @@
-{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-    <h1>Error</h1>
-    <p>{{ message }}</p>
-{% endblock %}
+<head>
+    <title>Chats</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="login-form" style="max-width:100%">
+    <h2 style="text-align:center;background-color:orange">Error</h2>
+        <p style="text-align:center;color:orange">{{ message }}</p>
+        <button type="button"><a href="{% url 'chat:room_list' %}">Back to Chats</a></button>
+    </div>
+</body>
+</html>

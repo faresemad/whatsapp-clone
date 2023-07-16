@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Chats</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class="container mt-3 p-5">
+        <h2>Chats</h2>
+        <div class="row">
+            <div class="col-12 col-md-8">
+                <div class="mb-2">
+                    <label for="roomInput">Enter a room name to connect to it:</label>
+                    <input type="text" class="form-control" id="roomInput" placeholder="Room name">
+                    <small id="roomInputHelp" class="form-text text-muted">If the room doesn't exist yet, it will be
+                        created for you.</small>
+                </div>
+                <button type="button" id="roomConnect" class="btn btn-success">Connect</button>
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="roomSelect">Active rooms</label>
+                <select multiple class="form-control" id="roomSelect">
+                    {% for room in rooms %}
+                    <option>{{ room }}</option>
+                    {% endfor %}
+                    {% comment %} <option value="1">Scorpion</option> {% endcomment %}
+                </select>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
