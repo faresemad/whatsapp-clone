@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import ChatRoom
+from .models import ChatRoom, Message
 from .forms import ChatRoomForm
 from django.contrib.auth.decorators import login_required
 
@@ -11,9 +11,13 @@ def room_detail(request, room_name):
     try:
         # check if current user in chat room users
         room = ChatRoom.objects.get(name=room_name, users=request.user)
+        if room:
+            messages = Message.objects.filter(chatroom=room)
+        else:
+            messages = None
     except ChatRoom.DoesNotExist:
         return render(request, "chat/error.html", {"message": "Room does not exist or you are not a member of this room"})
-    return render(request, "chat/chat.html", {"room": room})
+    return render(request, "chat/chat.html", {"room_name": room.name, "messages": messages})
 
 @login_required
 def room_list(request):
