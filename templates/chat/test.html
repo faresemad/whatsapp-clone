@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+</head>
+<body>
+    <div id="chat-log"></div>
+    <input id="chat-message-input" type="text" size="100">
+    <button id="chat-message-submit" type="button">Send</button>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        const roomName = "{{ room_name }}";
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host +
+            '/ws/chat/' + roomName + '/');
+
+        chatSocket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            $('#chat-log').append(data.message + '<br>');
+        };
+
+        chatSocket.onclose = function(event) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        $('#chat-message-input').focus();
+        $('#chat-message-input').on('keyup', function(e) {
+            if (e.keyCode === 13) {
+                $('#chat-message-submit').click();
+            }
+        });
+
+        $('#chat-message-submit').on('click', function(e) {
+            const messageInputDom = $('#chat-message-input');
+            const message = messageInputDom.val();
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.val('');
+        });
+    </script>
+</body>
+</html>

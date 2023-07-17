@@ -13,6 +13,7 @@ chatSocket.onmessage = function (e) {
     document.querySelector('#chat-log').value += (data.message + '\n');
 }
 
+
 chatSocket.onclose = function (e) {
     console.error('Chat socket closed unexpectedly');
 }

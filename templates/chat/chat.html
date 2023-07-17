@@ -1,14 +1,15 @@
 {% load static %}
+
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <title>Chat</title>
+    <meta charset="utf-8">
+    <title>Chat Room</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
 
+</head>
 <body>
-    <section class="msger">
+        <section class="msger">
         <header class="msger-header">
             <div class="msger-header-title">
                 <i class="fas fa-comment-alt"></i>{{ room_name }}
@@ -17,53 +18,114 @@
                 <span><i class="fas fa-cog"></i></span>
             </div>
         </header>
-
         <main class="msger-chat">
-            <div class="chat-log">
-                {% for message in messages %}
-                {% if message.user == request.user.id %}
-                    <div class="msg left-msg">
-                        <div class="msg-img" style="background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg)">
-                        </div>
-
+        <div class="chat-log">
+            {% for message in messages %}
+                {% if message.user == request.user %}
+                    <div class="msg right-msg">
                         <div class="msg-bubble">
                             <div class="msg-info">
-                                <div class="msg-info-name">{{message.user.username}}</div>
-                                <div class="msg-info-time">12:45</div>
+                                <span class="msg-info-name">{{ message.user.username }}</span>
+                                <span class="msg-info-time">{{ message.timestamp|date:'H:i' }}</span>
                             </div>
-
-                            <div class="msg-text">
-                                {{message.message}}
-                            </div>
+                            <div class="msg-text">{{ message.message }}</div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="msg right-msg">
-                        <div class="msg-img" style="background-image: url(https://image.flaticon.com/icons/svg/145/145867.svg)">
-                        </div>
-
+                    <div class="msg left-msg">
                         <div class="msg-bubble">
                             <div class="msg-info">
-                                <div class="msg-info-name">{{message.user.username}}</div>
-                                <div class="msg-info-time">12:46</div>
+                                <span class="msg-info-name">{{ message.user.username }}</span>
+                                <span class="msg-info-time">{{ message.timestamp|date:'H:i' }}</span>
                             </div>
-
-                            <div class="msg-text">
-                                {{message.message}}
-                            </div>
+                            <div class="msg-text">{{ message.message }}</div>
                         </div>
                     </div>
                 {% endif %}
             {% endfor %}
         </div>
         </main>
+        <div class="msger-inputarea">
+            <input type="text" id="chat-message-input" placeholder="Type your message here...">
+            <button id="chat-message-submit">Send</button>
+        </div>
+    </div>
+</section>
+{{request.user.id|json_script:"user-id"}}
+<script>
+    const roomName = "{{ room_name }}";
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName + '/');
 
-        <form class="msger-inputarea">
-            <input type="text" id="chat-message-input" class="msger-input" placeholder="Enter your message...">
-            <button type="submit" id="chat-message-submit" class="msger-send-btn">Send</button>
-            {{ room_name|json_script:"room-name" }}
-        </form>
-    </section>
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const message = data['message'];
+        const username = data['user'];
+        const timestamp = data['created_at'];
+        const currentUser = JSON.parse(document.getElementById('user-id').textContent);
+        const chatMessagesContainer = document.querySelector('.chat-log');
+        if (currentUser == username) {
+            console.log('current user'+username)
+        }else{
+            console.log('other user'+username)
+        }
+        const chatMessage = document.createElement('div');
+        chatMessage.classList.add('msg', 'right-msg');
+
+        const chatBubble = document.createElement('div');
+        chatBubble.classList.add('msg-bubble');
+
+        const chatMessageUserTime = document.createElement('div');
+        chatMessageUserTime.classList.add('msg-info');
+
+        const chatMessageUsername = document.createElement('span');
+        chatMessageUsername.classList.add('msg-info-name');
+        chatMessageUsername.innerText = username;
+
+        const chatMessageTimestamp = document.createElement('span');
+        chatMessageTimestamp.classList.add('msg-info-time');
+        chatMessageTimestamp.innerText = timestamp;
+
+        chatMessageUserTime.appendChild(chatMessageUsername);
+        chatMessageUserTime.appendChild(chatMessageTimestamp);
+
+        const chatMessageText = document.createElement('div');
+        chatMessageText.classList.add('msg-text');
+        chatMessageText.innerText = message;
+
+        chatBubble.appendChild(chatMessageUserTime);
+        chatBubble.appendChild(chatMessageText);
+        chatMessage.appendChild(chatBubble);
+
+        chatMessagesContainer.appendChild(chatMessage);
+
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    const chatMessageInput = document.getElementById('chat-message-input');
+    const chatMessageSubmit = document.getElementById('chat-message-submit');
+
+    chatMessageInput.focus();
+
+    chatMessageInput.addEventListener('keydown', function(event) {
+        if (event.keyCode === 13) {  // Enter key
+            chatMessageSubmit.click();
+        }
+    });
+
+    chatMessageSubmit.addEventListener('click', function(event) {
+        const message = chatMessageInput.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+        }));
+        chatMessageInput.value = '';
+    });
+</script>
+
 </body>
-<script src="{% static 'js/chat.js' %}"></script>
 </html>
